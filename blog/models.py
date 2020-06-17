@@ -1,15 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 import uuid
 
 class Author(models.Model):
     """Model for a post authors, linked to Users. """
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    bio = models.TextField(max_length=1000, default="", help_text="Bio information for this author.")
     joined_date = models.DateField()
 
     def __str__(self):
         return self.user.username
+
+    def get_absolute_url(self):
+        return reverse('author_detail', args=[str(self.pk)])
 
 class Tag(models.Model):
     """Model for post's tags."""
@@ -30,10 +35,13 @@ class Post(models.Model):
 
     last_modified = models.DateTimeField(null=True, blank=True)
 
-    tags = models.ManyToManyField(Tag, help_text="Add tags for the post.")
+    tags = models.ManyToManyField(Tag, blank=True, help_text="Add tags for the post.")
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.pk)])
 
 class Comment(models.Model):
     """Model for a post's comments."""
